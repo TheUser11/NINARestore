@@ -5,8 +5,9 @@ NINARestore is an iOS (App Store installed) AIM patcher for NINA for iOS/iPadOS 
 To run the script, clone this repository and run the following commands:
 ```sh
 pip install -r requirements.txt
-python3 trollstore.py
+python3 patch.py
 ```
+If on Windows, iTunes must be installed.
 Find My must be disabled on the target device, it can be re-enabled afterwards
 
 # Post-installation
