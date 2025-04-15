@@ -47,13 +47,13 @@ def cli(ctx, service_provider: LockdownClient) -> None:
     os_name = (os_names[device_class] + " ") if device_class in os_names else ""
     if (
         device_version < parse_version("15.2")
-        or device_version > parse_version("17.0")
-        or parse_version("16.7") < device_version < parse_version("17.0")
+        or device_version > parse_version("18.0.1")
+        or parse_version("16.7") < device_version < parse_version("18.0")
         or device_version == parse_version("16.7")
         and device_build != "20H18"  # 16.7 RC
     ):
         click.secho(f"{os_name}{device_version} ({device_build}) is not supported.", fg="red")
-        click.secho("This tool is only compatible with iOS/iPadOS 15.2 - 16.7 RC and 17.0.", fg="red")
+        click.secho("This tool is only compatible with iOS/iPadOS 15.2 - 16.7 RC and 18.0(.1).", fg="red")
         return
 
     app = "Universal AIM"
