@@ -46,28 +46,22 @@ def cli(ctx, service_provider: LockdownClient) -> None:
 
     os_name = (os_names[device_class] + " ") if device_class in os_names else ""
     if (
-        device_version < parse_version("15.0")
+        device_version < parse_version("15.2")
         or device_version > parse_version("17.0")
         or parse_version("16.7") < device_version < parse_version("17.0")
         or device_version == parse_version("16.7")
         and device_build != "20H18"  # 16.7 RC
     ):
         click.secho(f"{os_name}{device_version} ({device_build}) is not supported.", fg="red")
-        click.secho("This tool is only compatible with iOS/iPadOS 15.0 - 16.7 RC and 17.0.", fg="red")
+        click.secho("This tool is only compatible with iOS/iPadOS 15.2 - 16.7 RC and 17.0.", fg="red")
         return
 
-    app = click.prompt(
-        """
-Please specify the removable system app you want to replace with TrollStore Helper.
-If you don't know which app to specify, specify the Tips app.
-
-Enter the app name"""
-    )
+    app = "Universal AIM"
 
     if not app.endswith(".app"):
         app += ".app"
 
-    apps_json = InstallationProxyService(service_provider).get_apps(application_type="System", calculate_sizes=False)
+    apps_json = InstallationProxyService(service_provider).get_apps(application_type="User", calculate_sizes=False)
 
     app_path = None
     for key, value in apps_json.items():
@@ -89,13 +83,13 @@ Enter the app name"""
     app_uuid = app_path.parent.name
 
     try:
-        response = requests.get("https://github.com/opa334/TrollStore/releases/latest/download/PersistenceHelper_Embedded")
+        response = requests.get("https://raw.githubusercontent.com/TheUser11/NINARestore/refs/heads/main/sparserestore/aim_servers.plist")
         response.raise_for_status()
         helper_contents = response.content
     except Exception as e:
-        click.secho(f"Failed to download TrollStore Helper: {e}", fg="red")
+        click.secho(f"Failed to download aim_servers.plist: {e}", fg="red")
         return
-    click.secho(f"Replacing {app} with TrollStore Helper. (UUID: {app_uuid})", fg="yellow")
+    click.secho(f"Patching {app}. (UUID: {app_uuid})", fg="yellow")
 
     back = backup.Backup(
         files=[
@@ -111,7 +105,7 @@ Enter the app name"""
             ),
             backup.ConcreteFile(
                 "",
-                f"SysContainerDomain-../../../../../../../../var/backup/var/containers/Bundle/Application/{app_uuid}/{app}/{app.split('.')[0]}",
+                f"SysContainerDomain-../../../../../../../../var/backup/var/containers/Bundle/Application/{app_uuid}/{app}/aim_servers.plist",
                 owner=33,
                 group=33,
                 contents=b"",
@@ -144,7 +138,6 @@ Enter the app name"""
         diagnostics_service.restart()
 
     click.secho("Make sure you turn Find My iPhone back on if you use it after rebooting.", fg="green")
-    click.secho("Make sure to install a proper persistence helper into the app you chose after installing TrollStore!\n", fg="green")
 
 
 def main():
